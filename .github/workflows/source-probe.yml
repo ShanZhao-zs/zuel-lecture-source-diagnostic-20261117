@@ -1,0 +1,41 @@
+name: One-time public source diagnostic
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/source-probe.yml]
+
+permissions: {}
+
+concurrency:
+  group: one-time-public-source-diagnostic
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    if: ${{ github.repository == 'ShanZhao-zs/zuel-lecture-source-diagnostic-20261117' && github.run_number == 1 && github.run_attempt == 1 }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GIT_TERMINAL_PROMPT: '0'
+      CI: 'true'
+    steps:
+      - name: Clone only this public diagnostic repository without credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --single-branch --branch main --no-tags https://github.com/ShanZhao-zs/zuel-lecture-source-diagnostic-20261117.git diagnostic
+          cd diagnostic
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -f probe.mjs
+      - name: Install pinned official Playwright in this disposable runner only
+        shell: bash
+        working-directory: diagnostic
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org playwright@1.65.1
+          ./node_modules/.bin/playwright install --with-deps chromium
+      - name: Read each approved public source once without credentials or evasion
+        shell: bash
+        working-directory: diagnostic
+        run: node probe.mjs
