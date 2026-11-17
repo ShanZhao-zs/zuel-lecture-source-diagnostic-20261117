@@ -4,8 +4,9 @@ This repository contains only standalone diagnostic code and this description.
 It does not contain the lecture assistant project, private files, application
 IDs, calendar IDs, secrets, cookies, cloud credentials or personal data.
 
-The owner explicitly approved one run on GitHub's standard `ubuntu-latest`
-hosted runner to check these two public URLs:
+The first workflow run ended before any diagnostic step started. On
+2026-11-17 the owner explicitly requested one additional bounded try, using
+the same standard `ubuntu-latest` hosted runner and these two public URLs:
 
 - `https://csxy.zuel.edu.cn/7106/list.htm`
 - `https://jjxy.zuel.edu.cn/2733/list.psp`
@@ -14,11 +15,12 @@ hosted runner to check these two public URLs:
 
 - One ordinary headless Chromium navigation per source, sequentially. Navigation
   is limited to 20 seconds and normal network settling to at most 5 seconds,
-  within a 25-second per-source diagnostic deadline (plus bounded cleanup).
+  with a 25-second per-source navigation/read deadline (plus initialization
+  and bounded cleanup). The entire job has a five-minute hard limit.
 - Default browser identity. No stealth packages, user-agent override, custom
   headers, cookies, authentication, init-script injection, challenge solving,
   response decryption or private API calls.
-- Network requests are limited to each current college's HTTPS origin and the
+- HTTP requests are limited to each current college's HTTPS origin and the
   already-observed official `https://info.zuel.edu.cn/uv.js` script. Top-level or
   frame documents must remain at the exact approved source URL. Downloads and
   service workers are disabled to retain this network boundary.
@@ -34,7 +36,8 @@ hosted runner to check these two public URLs:
   clones this public repository via its plain HTTPS URL without a checkout
   action or credentials and checks its commit against the triggering SHA.
 - Only a push changing the workflow file can trigger this workflow. The job
-  additionally requires run number 1 and attempt 1. There is no schedule,
+  now requires exactly run number 2 and attempt 1, corresponding to this newly
+  approved single try. No automatic third run is allowed. There is no schedule,
   dispatch, pull-request trigger, automatic retry or second cloud provider.
 - The job is limited to five minutes and uses the standard public-repository
   runner. It does not enable a paid plan, larger runner, persistent server or
@@ -47,9 +50,10 @@ Chromium build with Microsoft's documented CLI. No third-party Actions are used.
 
 ## Upload order and interpretation
 
-Upload `probe.mjs` and this README first. Upload
-`.github/workflows/source-probe.yml` last, so its first push initiates the single
-approved diagnostic run with the script already present.
+The script was already uploaded and its contents verified. For this specifically
+approved repeat, update this README first and the workflow last; that workflow
+push initiates the sole newly approved run number 2. Do not rerun the old job or
+change the branch again while the diagnostic is running.
 
 A `public_list_readable` result establishes only that this particular runner
 could read article links during this one request. It does **not** establish
