@@ -3,8 +3,10 @@ import { pathToFileURL } from 'node:url';
 
 // Standalone public diagnostic. No imports from the lecture assistant project.
 export const SOURCES = Object.freeze([
-  Object.freeze({ id: 'finance', url: 'https://csxy.zuel.edu.cn/7106/list.htm' }),
-  Object.freeze({ id: 'economics', url: 'https://jjxy.zuel.edu.cn/2733/list.psp' }),
+  Object.freeze({ id: 'finance', url: 'https://csxy.zuel.edu.cn/7106/list.htm', columnId: 7106 }),
+  Object.freeze({ id: 'economics', url: 'https://jjxy.zuel.edu.cn/2834/list.htm', columnId: 2834 }),
+  Object.freeze({ id: 'wenlan', url: 'https://wls.zuel.edu.cn/xsdt/list.htm', columnId: 10640 }),
+  Object.freeze({ id: 'economic_trade', url: 'https://jmxy.zuel.edu.cn/xsjz2/list.htm', columnId: 17989 }),
 ]);
 
 export function protectionFlag(html) {
@@ -25,18 +27,23 @@ export function allowedRequest(sourceId, input, resourceType = 'other') {
     (resourceType === 'script' && url.origin === 'https://info.zuel.edu.cn' && url.pathname === '/uv.js' && !url.search);
 }
 
-export function articleCount(sourceId, html) {
+export function articleLinks(sourceId, html) {
   const source = SOURCES.find(item => item.id === sourceId);
-  if (!source || typeof html !== 'string' || protectionFlag(html)) return 0;
+  if (!source || typeof html !== 'string' || protectionFlag(html)) return [];
   const origin = new URL(source.url).origin, found = new Set();
+  const path = new RegExp(`^/\\d{4}/\\d{4}/c${source.columnId}a\\d+/page\\.(?:htm|psp)$`);
   for (const match of html.matchAll(/<a\b[^>]*\bhref\s*=\s*["']([^"']+)["'][^>]*>/gi)) {
     try {
       const url = new URL(match[1].replaceAll('&amp;', '&'), source.url);
-      if (url.origin === origin && !url.username && !url.password &&
-          /^\/\d{4}\/\d{4}\/c\d+a\d+\/page\.(?:htm|psp)$/.test(url.pathname)) found.add(url.origin + url.pathname);
+      if (url.origin === origin && !url.username && !url.password && !url.search &&
+          path.test(url.pathname)) found.add(url.origin + url.pathname);
     } catch { /* Ignore malformed/non-article links, never infer content. */ }
   }
-  return found.size;
+  return [...found];
+}
+
+export function articleCount(sourceId, html) {
+  return articleLinks(sourceId, html).length;
 }
 
 function shortTitle(value) {
@@ -108,7 +115,9 @@ export async function probeSource(browser, sourceId) {
     else if (html.length > 450000) result.result = 'content_size_limit';
     else if (result.http_status !== 200) result.result = 'source_http_error';
     else {
-      result.same_origin_articles = articleCount(source.id, html);
+      const links = articleLinks(source.id, html);
+      result.same_origin_articles = links.length;
+      result.article_samples = links.slice(0, 3);
       result.result = result.same_origin_articles > 0 ? 'public_list_readable' : 'no_valid_article_links';
     }
   } catch {
