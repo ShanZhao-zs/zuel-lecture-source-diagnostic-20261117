@@ -4,12 +4,19 @@ This repository contains only standalone diagnostic code and this description.
 It does not contain the lecture assistant project, private files, application
 IDs, calendar IDs, secrets, cookies, cloud credentials or personal data.
 
-The first workflow run ended before any diagnostic step started. On
-2026-11-17 the owner explicitly requested one additional bounded try, using
-the same standard `ubuntu-latest` hosted runner and these two public URLs:
+The first two workflow runs ended before any diagnostic step started because
+GitHub reported an account billing lock. On 2026-11-18 the owner requested
+another cloud-collection test. This is one additional bounded try, using
+the same standard `ubuntu-latest` hosted runner and four confirmed public URLs:
 
 - `https://csxy.zuel.edu.cn/7106/list.htm`
-- `https://jjxy.zuel.edu.cn/2733/list.psp`
+- `https://jjxy.zuel.edu.cn/2834/list.htm`
+- `https://wls.zuel.edu.cn/xsdt/list.htm`
+- `https://jmxy.zuel.edu.cn/xsjz2/list.htm`
+
+The economics source now uses its confirmed lecture column 2834, not the old
+2733 candidate. Article links must match each college's exact lecture column
+(7106, 2834, 10640 and 17989 respectively), not an arbitrary same-site article.
 
 ## Boundaries
 
@@ -28,31 +35,32 @@ the same standard `ubuntu-latest` hosted runner and these two public URLs:
   program does not remove or conceal automation indicators. A protection page,
   timeout, HTTP failure or zero valid links is not reported as “no new lectures”.
 - The only diagnostic output is JSON containing the fixed source name, HTTP
-  status, page title (maximum 120 characters), same-origin article-link count,
-  protection flag and an enumerated result. No HTML, page console, cookies,
+  status, page title (maximum 120 characters), same-column article-link count,
+  up to three public article URLs, protection flag and an enumerated result.
+  No HTML, page console, cookies,
   screenshots, traces, attachments, artifacts, caches or decrypted content are
   uploaded.
 - `permissions: {}`; no secrets or access tokens are referenced. The workflow
   clones this public repository via its plain HTTPS URL without a checkout
   action or credentials and checks its commit against the triggering SHA.
 - Only a push changing the workflow file can trigger this workflow. The job
-  now requires exactly run number 2 and attempt 1, corresponding to this newly
-  approved single try. No automatic third run is allowed. There is no schedule,
+  now requires exactly run number 3 and attempt 1, corresponding to this newly
+  requested single try. No automatic fourth run is allowed. There is no schedule,
   dispatch, pull-request trigger, automatic retry or second cloud provider.
 - The job is limited to five minutes and uses the standard public-repository
   runner. It does not enable a paid plan, larger runner, persistent server or
   any billing action. Dependency installation occurs only in the disposable
   runner, not on the owner's computer.
 
-The official npm registry returned `playwright` **1.65.1** (Node.js >=20) on
-2026-11-17. The workflow pins that exact version and installs its official
+The official npm registry confirmed `playwright` **1.65.1** again on
+2026-11-18. The workflow pins that exact version and installs its official
 Chromium build with Microsoft's documented CLI. No third-party Actions are used.
 
 ## Upload order and interpretation
 
-The script was already uploaded and its contents verified. For this specifically
-approved repeat, update this README first and the workflow last; that workflow
-push initiates the sole newly approved run number 2. Do not rerun the old job or
+For this specifically requested repeat, upload and verify the updated script
+and README first, then update the workflow last; that workflow push initiates
+the sole newly requested run number 3. Do not rerun the old job or
 change the branch again while the diagnostic is running.
 
 A `public_list_readable` result establishes only that this particular runner
